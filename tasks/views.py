@@ -15,22 +15,25 @@ from .models import Task
 
 @csrf_exempt
 def tasks(request):
+
     '''
     List all task snippets
     '''
     if(request.method == 'GET'):
         # get all the tasks
+
         tasks = Task.objects.all()
         # serialize the task data
         serializer = TaskSerializer(tasks, many=True)
         # return a Json response
-        return JsonResponse(serializer.data,safe=False)
+        return HttpResponse(serializer.data,safe=False)
     elif(request.method == 'POST'):
         # parse the incoming information
         data = JSONParser().parse(request)
         # instanciate with the serializer
         serializer = TaskSerializer(data=data)
         # check if the sent information is okay
+
         if(serializer.is_valid()):
             # if okay, save it on the database
             serializer.save()
