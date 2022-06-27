@@ -26,7 +26,13 @@ def tasks(request):
         # serialize the task data
         serializer = TaskSerializer(tasks, many=True)
         # return a Json response
-        return HttpResponse(serializer.data,safe=False)
+        # import ipdb; ipdb.set_trace()
+        # dictionary = serializer.data
+        # list_of_data=[]
+        # for dict1 in dictionary:
+        #     list_of_data.append(dict(dict1))
+        # print(list_of_data)
+        return JsonResponse(serializer.data,safe=False)
     elif(request.method == 'POST'):
         # parse the incoming information
         data = JSONParser().parse(request)
@@ -43,16 +49,22 @@ def tasks(request):
         return JsonResponse(serializer.errors, status=400)
 
 @csrf_exempt
-def task_detail(request, pk):
+def task_detail(request,id):
+    print("-----0",request.method)
     try:
         # obtain the task with the passed id.
-        task = Task.objects.get(pk=pk)
+        task = Task.objects.get(pk=id)
     except:
         # respond with a 404 error message
-        return HttpResponse(status=404)  
+        return HttpResponse(status=404)
+    
+    if (request.method =='GET'):
+        serializer = TaskSerializer(task)
+        return JsonResponse(serializer.data)
+        
     if(request.method == 'PUT'):
         # parse the incoming information
-        data = JSONParser().parse(request)  
+        data = JSONParser().parse(request)
         # instanciate with the serializer
         serializer = TaskSerializer(task, data=data)
         # check whether the sent information is okay
@@ -63,7 +75,8 @@ def task_detail(request, pk):
             return JsonResponse(serializer.data, status=201)
         # provide a JSON response with the necessary error information
         return JsonResponse(serializer.errors, status=400)
-    elif(request.method == 'DELETE'):
+    if (request.method == 'DELETE'):
+        # import ipdb; ipdb.set_trace()
         # delete the task
         task.delete() 
         # return a no content response.
